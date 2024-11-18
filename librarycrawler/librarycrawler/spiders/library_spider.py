@@ -3,8 +3,8 @@ from scrapy.linkextractors import LinkExtractor
 
 class LibarySpider(CrawlSpider):
     name = "library-ensign"
-    allowed_domains = ["library.ensign.edu","libraryguides.ensign.edu"]
-    start_urls = ["https://library.ensign.edu/"] # list of starting urls for the crawler
+    allowed_domains = ["libraryguides.ensign.edu"]
+    start_urls = ["https://libraryguides.ensign.edu/"] # list of starting urls for the crawler
     handle_httpstatus_list = [200, 301, 302, 303, 307, 400, 401, 403, 404, 500] # only 200 by default. you can add more status to list
 
     rules = (
@@ -14,6 +14,8 @@ class LibarySpider(CrawlSpider):
     )
 
     def parse_my_url(self, response):
+        MAIN_SELECTOR = '.s-lg-guide-main'
+        NEXT_SELECTOR = '.next a::attr("href")'
         report_if =[
         400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 415, 416, 417, 418, 421, 422, 423, 424, 425, 426, 428, 429, 431, 451,
         500, 501, 502, 503, 504, 505, 506, 507, 508, 510, 511 
@@ -26,3 +28,7 @@ class LibarySpider(CrawlSpider):
             item['response']= response.url
             yield item
         yield None # if the response did not match return empty
+
+        next_page = response.css(NEXT_SELECTOR).extract_first()
+        if next_page:
+            yield scrapy.request(response.urljoin(next_page))
