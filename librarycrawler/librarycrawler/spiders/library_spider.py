@@ -7,7 +7,7 @@ class LibrarySpider(CrawlSpider):
     name = "library-ensign"
     allowed_domains = ["libraryguides.ensign.edu"]
     start_urls = ["https://libraryguides.ensign.edu/?b=g&d=a"]
-    handle_httpstatus_list = [200, 301, 302, 303, 307, 400, 401, 403, 404, 500]  # Add status codes you care about
+    handle_httpstatus_list = [301, 302, 303, 307, 400, 401, 403, 404, 500]  # Add status codes you care about
     report_if = [400, 401, 402, 403, 404, 500, 501, 502, 503, 504]
 
     rules = (
