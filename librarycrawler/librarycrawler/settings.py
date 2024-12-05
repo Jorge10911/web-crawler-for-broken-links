@@ -11,7 +11,11 @@ BOT_NAME = "librarycrawler"
 
 SPIDER_MODULES = ["librarycrawler.spiders"]
 NEWSPIDER_MODULE = "librarycrawler.spiders"
+USER_AGENT = 'MyCustomBot/1.0 (jomavaca123@gmail.com)'
 
+DOWNLOADER_MIDDLEWARES = {
+    'librarycrawler.middlewares.UserAgentBlockMiddleware': 543,
+}
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = "librarycrawler (+http://www.yourdomain.com)"
@@ -20,7 +24,7 @@ NEWSPIDER_MODULE = "librarycrawler.spiders"
 ROBOTSTXT_OBEY = True
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-#CONCURRENT_REQUESTS = 32
+CONCURRENT_REQUESTS = 32
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay

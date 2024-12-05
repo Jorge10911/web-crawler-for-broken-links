@@ -4,6 +4,7 @@
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
 from scrapy import signals
+from scrapy.exceptions import IgnoreRequest
 
 # useful for handling different item types with a single interface
 from itemadapter import is_item, ItemAdapter
@@ -101,3 +102,20 @@ class LibrarycrawlerDownloaderMiddleware:
 
     def spider_opened(self, spider):
         spider.logger.info("Spider opened: %s" % spider.name)
+
+class UserAgentBlockMiddleware:
+    """
+    Middleware to modify or block requests based on the User-Agent header.
+    """
+
+    def process_request(self, request, spider):
+        # Example: Log the User-Agent for debugging
+        spider.logger.info(f"Request User-Agent: {request.headers.get('User-Agent')}")
+        
+        # Block requests with a specific User-Agent (optional logic)
+        if b'blocked-user-agent' in request.headers.get('User-Agent', b''):
+            spider.logger.info(f"Blocked User-Agent: {request.headers.get('User-Agent')}")
+            raise IgnoreRequest(f"Blocked User-Agent: {request.headers.get('User-Agent')}")
+
+        return None
+
