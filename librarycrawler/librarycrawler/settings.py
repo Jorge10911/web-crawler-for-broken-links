@@ -15,7 +15,11 @@ USER_AGENT = 'MyCustomBot/1.0 (jomavaca123@gmail.com)'
 
 DOWNLOADER_MIDDLEWARES = {
     'librarycrawler.middlewares.UserAgentBlockMiddleware': 543,
+    'scrapy_splash.SplashMiddleware': 725,
+    'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': 810,
 }
+
+SPLASH_URL = 'http://localhost:8050'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = "librarycrawler (+http://www.yourdomain.com)"
@@ -48,9 +52,10 @@ DOWNLOAD_DELAY = 10
 
 # Enable or disable spider middlewares
 # See https://docs.scrapy.org/en/latest/topics/spider-middleware.html
-#SPIDER_MIDDLEWARES = {
-#    "librarycrawler.middlewares.LibrarycrawlerSpiderMiddleware": 543,
-#}
+SPIDER_MIDDLEWARES = {
+    "librarycrawler.middlewares.LibrarycrawlerSpiderMiddleware": 543,
+    'scrapy_splash.SplashSpiderMiddleware': 725,
+}
 
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
@@ -89,7 +94,8 @@ DOWNLOAD_DELAY = 10
 #HTTPCACHE_EXPIRATION_SECS = 0
 #HTTPCACHE_DIR = "httpcache"
 #HTTPCACHE_IGNORE_HTTP_CODES = []
-#HTTPCACHE_STORAGE = "scrapy.extensions.httpcache.FilesystemCacheStorage"
+HTTPCACHE_STORAGE = 'scrapy_splash.DummyCacheStorage'
+DUPEFILTER_CLASS = 'scrapy_splash.SplashAwareDupeFilter'
 
 # Set settings whose default value is deprecated to a future-proof value
 REQUEST_FINGERPRINTER_IMPLEMENTATION = "2.7"

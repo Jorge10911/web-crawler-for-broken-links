@@ -2,6 +2,9 @@ import scrapy
 from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
 from librarycrawler.items import LibrarycrawlerItem  # Adjust based on where your item is defined
+from scrapy_splash import SplashRequest
+
+#write this in terminal to run this spider: scrapy crawl library-ensign
 
 class LibrarySpider(CrawlSpider):
     name = "library-ensign"
@@ -11,21 +14,36 @@ class LibrarySpider(CrawlSpider):
     report_if = [400, 401, 402, 403, 404, 500, 501, 502, 503, 504]
 
     rules = (
-        Rule(LinkExtractor(allow="/libraryguides/"), callback="parse_start_page", follow=True), 
+        Rule(LinkExtractor(allow="/libraryguides/"), callback="start_requests", follow=True), 
     )
 
+
+    def start_requests(self):
+        # Use SplashRequest to handle JavaScript rendering
+        for url in self.start_urls:
+            yield SplashRequest(url, self.parse_start_page, args={'wait': 2})
+                                
     def parse_start_page(self, response):
-        guide_links = response.css('div.s-lib-box-idx-guide-list a::attr(href)').getall()
+        self.logger.info(f"Crawled start page: {response.url}")
+        self.save_url(response.url)
+        guide_links = response.css('a.bold::attr(href)').getall()
+        print(guide_links)
         for link in guide_links:
-            yield response.follow(link, self.parse_guide_page)
+            yield response.follow(link, self.parse_my_url)
   
     def parse_guide_page(self, response):
+        self.logger.info(f"Crawled guidepage: {response.url}")
+        self.save_url(response.url)
         nav_links = response.css('div#s-lg-guide-tabs a::attr(href)').getall()
+        print(nav_links)
         for link in nav_links:
             yield response.follow(link, self.parse_my_url)
 
     def parse_my_url(self, response):
-        body_links = response.css('div.content a::attr(href)').getall()
+        self.logger.info(f"Crawled body URL: {response.url}")
+        self.save_url(response.url)
+        body_links = response.css('ul.s-lg-link-list li a::attr(href)').getall()
+        print(body_links)
         for link in body_links:
             if link:
                 full_url = response.urljoin(link)
@@ -39,6 +57,10 @@ class LibrarySpider(CrawlSpider):
             item['status'] = response.status
             item['response'] = response.url
             yield item
+    
+    def save_url(self, url, filename="crawled_urls.txt"):
+        with open(filename, "a") as f:
+            f.write(url + "\n")
 
     def handle_error(self, failure):
         self.logger.error(repr(failure))
@@ -48,6 +70,7 @@ class LibrarySpider(CrawlSpider):
         item['status'] = failure.value.response.status if failure.value.response else 'N/A'
         item['response'] = failure.request.url
         yield item
+'''
         To run your Scrapy spider, follow these steps:
 
 1. **Install Scrapy**:
@@ -97,3 +120,4 @@ class LibrarySpider(CrawlSpider):
    ```
 
 This command will start the crawling process, and you should see the output in your terminal. If you encounter any issues, check the error messages for clues on what might be going wrong. Feel free to share any specific errors you encounter, and I can help troubleshoot them!
+'''
